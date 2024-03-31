@@ -9,6 +9,7 @@ import 'pages/sala espara/wait.dart';
 import 'pages/sala espara/wait_votos.dart';
 
 void main() async {
+  
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp(
@@ -43,7 +44,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       routes: {
-        "/": (_) => const Login(),
+        "/": (_) => Login(),
         "/A": (_) => const Abertura(),
         "/wait": (_) => const Wait(),
         "/home": (_) => const HomePage(),

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:embrasa2/glabal/global.dart';
 import 'package:embrasa2/pages/homePage.dart';
+import 'package:embrasa2/pages/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -22,7 +24,7 @@ class _WaitState extends State<Wait> {
     gerarNumero();
     radonF();
     _timerAtivo = true;
-    
+
     // Inicia o temporizador de dois minutos
     // Atualiza o campo "status" no Firestore para "jogar"
     iniciarTemporizador();
@@ -59,6 +61,19 @@ class _WaitState extends State<Wait> {
     });
   }
 
+  Future<void> deleteNome() async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final QuerySnapshot snapshot = await firestore.collection('nomes').get();
+
+    for (DocumentSnapshot doc in snapshot.docs) {
+      await doc.reference.delete();
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text('deletado com sucesso'),
+    ));
+  }
+
   Future<void> iniciarTemporizador() async {
     await Future.delayed(const Duration(seconds: 30), () {
       if (_timerAtivo) {
@@ -70,9 +85,8 @@ class _WaitState extends State<Wait> {
             'status': 'jogar',
           });
 
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content:
-                const Text('O status foi atualizado para "jogar" pela Wait'),
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('voce foi enviado para o jogo'),
           ));
         } catch (e) {
           print("Erro ao atualizar no Firestore: $e");
@@ -108,62 +122,123 @@ class _WaitState extends State<Wait> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'A Paciência é uma Virtude',
-          softWrap: true,
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
-      ),
-      body: Stack(
-        children: [
-          Positioned(
-            top: 130,
-            left: 30,
-            child: StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance.collection('nomes').snapshots(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.hasError) {
-                  return Text('Erro ao carregar os nomes: ${snapshot.error}');
-                }
-
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                }
-
-                // Exibir os nomes salvos
-                final List<QueryDocumentSnapshot> documents =
-                    snapshot.data!.docs;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: documents
-                      .map((QueryDocumentSnapshot document) => Text(
-                            document['nome'],
-                            style: TextStyle(fontSize: 20, color: Colors.white),
-                          ))
-                      .toList(),
-                );
-              },
+    if (VariaveisGlobais.listaDeAdms.contains(VariaveisGlobais.nomeUsuario)) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'A Paciência é uma Virtude',
+            softWrap: true,
+            style: TextStyle(
+              color: Colors.white,
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  print('printat status');
-                },
-                child: Text('lista status'),
-              )
-            ],
+        ),
+        body: Stack(
+          children: [
+            Positioned(
+              top: 130,
+              left: 30,
+              child: Container(
+                color: Colors.purple[900],
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('nomes')
+                      .snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return Text(
+                          'Erro ao carregar os nomes: ${snapshot.error}');
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+
+                    // Exibir os nomes salvos
+                    final List<QueryDocumentSnapshot> documents =
+                        snapshot.data!.docs;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: documents
+                          .map((QueryDocumentSnapshot document) => Row(
+                                children: [
+                                  IconButton(
+                                      onPressed: () {
+                                        deleteNome();
+                                      },
+                                      icon: Icon(Icons.close)),
+                                  Text(
+                                    document['nome'],
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  ),
+                                ],
+                              ))
+                          .toList(),
+                    );
+                  },
+                ),
+              ),
+            )
+          ],
+        ),
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'A Paciência é uma Virtude',
+            softWrap: true,
+            style: TextStyle(
+              color: Colors.white,
+            ),
           ),
-        ],
-      ),
-    );
+        ),
+        body: Stack(
+          children: [
+            Positioned(
+              top: 130,
+              left: 30,
+              child: Container(
+                  color: Colors.black,
+                  child: Row(children: [
+                    StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('nomes')
+                          .snapshots(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.hasError) {
+                          return Text(
+                              'Erro ao carregar os nomes: ${snapshot.error}');
+                        }
+
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
+
+                        // Exibir os nomes salvos
+                        final List<QueryDocumentSnapshot> documents =
+                            snapshot.data!.docs;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: documents
+                              .map((QueryDocumentSnapshot document) => Text(
+                                    document['nome'],
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  ))
+                              .toList(),
+                        );
+                      },
+                    ),
+                  ])),
+            )
+          ],
+        ),
+      );
+    }
   }
 }
