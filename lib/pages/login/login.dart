@@ -1,4 +1,3 @@
-import 'package:embrasa2/pages/sala%20espara/wait.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -28,10 +27,6 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   late String name;
-
-void text() {
-  
-}
 
   Future<void> deleteCollection() async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;

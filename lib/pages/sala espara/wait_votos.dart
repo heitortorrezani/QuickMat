@@ -13,7 +13,7 @@ class WaitVotos extends StatefulWidget {
 
 class _WaitVotosState extends State<WaitVotos> {
   late Future<Map<String, int>> _quantidadeNomesFuture;
-  late Timer _timer;
+  late Timer timer;
   bool _timerAtivo = true;
 
   @override
@@ -21,7 +21,7 @@ class _WaitVotosState extends State<WaitVotos> {
     super.initState();
     print('cheguei wait votos / wait votos');
     _quantidadeNomesFuture = calcularQuantidadeNomes();
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (_timerAtivo) {
         navegar();
       }
@@ -51,14 +51,14 @@ class _WaitVotosState extends State<WaitVotos> {
         _timerAtivo = false;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (BuildContext context) => const Matematica()),
+          MaterialPageRoute(
+              builder: (BuildContext context) => const Matematica()),
         );
       }
     } catch (e) {
       print("Erro ao buscar no Firestore: $e");
     }
-
-    }
+  }
 
   Future<Map<String, int>> calcularQuantidadeNomes() async {
     final QuerySnapshot querySnapshot =
