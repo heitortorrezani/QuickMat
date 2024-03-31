@@ -29,6 +29,10 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   late String name;
 
+void text() {
+  
+}
+
   Future<void> deleteCollection() async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final QuerySnapshot snapshot = await firestore.collection('nomes').get();
